@@ -51,12 +51,12 @@ dependencies {
 
 }
 
-task installGitHooks(type: Copy, group: "git-hooks") {
+task installGitHook(type: Copy, group: "git-hooks") {
     from new File(rootProject.rootDir, 'scripts/pre-commit')
     into { new File(rootProject.rootDir, '.git/hooks')}
     fileMode 0775
 }
-check.dependsOn installGitHooks
+check.dependsOn installGitHook
 
 tasks.withType(KotlinCompile) {
     kotlinOptions {

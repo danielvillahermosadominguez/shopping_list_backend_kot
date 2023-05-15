@@ -489,6 +489,29 @@ check.dependsOn installGitHooks
 <Inmediatly after the task of ktlint, include>
 check.dependsOn ktlint
 ```
+
+In addition, you will need a folder with a file with the following:
+scripts/pre-commit
+``` bash
+#!/bin/sh
+echo "▶️ Running pre-commit checks..."
+
+./gradlew ktlint
+EXIT_CODE=$?
+
+if [ ${EXIT_CODE} -ne 0 ]; then
+    echo "😵 Pre Commit checks failed. Please fix the above issues before committing"
+    exit ${EXIT_CODE}
+else
+    echo "✅ Pre Commit checks passed, no problems found"
+    exit 0
+fi
+```
+
+NOTE: The only problem that I have found it you need to install the pre-commit using
+        .\gradlew installGitHooks
+
+
 # Cucumber with spring configuration
 
 # Mokkt example
