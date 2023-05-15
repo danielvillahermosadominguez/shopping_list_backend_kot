@@ -186,30 +186,219 @@ Some unit tests will need to load the application context. You can use the notat
 
 ## Integration tests with @SpringBootTest
 with the @SpringBootTest you can load more things
+https://www.baeldung.com/kotlin/spring-boot-testing
+## Application test
 
-## Controller tests
-``` java
-@RunWith(SpringRunner.class)
-@SpringBootTest(
-  webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-  classes = Application.class)
-@AutoConfigureMockMvc
-@TestPropertySource(
-  locations = "classpath:application-integrationtest.properties")
-public class EmployeeRestControllerIntegrationTest {
+When you are creating application test, you load the service
+and the main idea is to test the service in a end to end way.
 
-    @Autowired
-    private MockMvc mvc;
+You could use FreeSpec.
 
-    @Autowired
-    private EmployeeRepository repository;
+The key in this class of tests is the notation @SpringBootTest which
+allow to load the context and the service.
 
-    // write test cases here
+The application test, by using cucumber, we will call them "acceptance tests". But,
+the concept is the same, the only difference is we are using cucumber for the tests.
+
+You can see it in the Cucumber configuration explaination.
+
+## MockK, kotest and assertions
+https://gradlehero.com/how-to-exclude-gradle-dependencies/
+https://www.baeldung.com/kotlin/kotest
+
+We will need mocking capabilities for our tests and Mockito is the default mocking service in
+Spring boot. The recomendation is to exclude the mockito-core dependency.
+
+You can see the dependencies in "External libraries" where you can see:
+- mockito-core
+- mockito-junit-jupiter
+
+testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+```
+dependencies {
+    //testImplementation 'io.kotest:kotest-runner-junit5-jvm:5.6.2'  <-- not neccesary
+    testImplementation 'io.mockk:mockk:1.13.5'
+    testImplementation 'io.kotest:kotest-runner-junit5:5.6.2'
+    testImplementation 'io.kotest:kotest-assertions-core:$version'
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+    
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.mockito', module: 'mockito-core'   
+        exclude group: 'org.mockito', module: 'mockito-junit-jupiter'     
+    }
+    testImplementation 'com.ninja-squad:springmockk:4.0.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    ...
+     
 }
 ```
-## JPA Tests
-@DataJpaTest
+Every library has a reason:
+* io.mockk (https://mockk.io/). This is the mocking library for Kotlin. Here you have all the documentation.
+  * mockk. In the maven repository, the last version is the 1.13.5 at this moment
+* com.ninja-squad (https://github.com/Ninja-Squad/springmockk). This is the spring support for mockk
+  * springmockk:3.0.1. With this library you could have MockBean and Spybewan
+* io.kotest:(https://kotest.io/docs/quickstart/) This is the test framework for kotlin
+  - kotest-runner-junit5-jvm:5.6.2 ==> compatibility with junit 5
+  - kotest-runner-junit5: 5.6.2 ==>  (the same) compatibility with junit you need it to run the tests with junit
+NOTE: The kotest-runner-junit5 install the following dependencies:
+    - i.kotest:kotest-assertions-api-jvm
+    - o.kotest:kotest-assertions-core-jvm
+    - io.kotest:kotest-shared-jvm
+    - io.kotest:kotest-common-jvm
+    - io.kotest:kotest-extensions-jvm
+    - io.kotest:kotest-framework-api-jvm
+    - io.kotest:kotest-framework-concurrency-jvm
+    - io.kotest:kotest-framework-discovery-jvm
+    - io.kotest:kotest-framework-engine-jvm
+    - io.kotest:kotest-runner-junit5-jvm
+    - 
+But when you install the kotest-runner-junit-jvm, the following dependencies are installed:
+    - i.kotest:kotest-assertions-api-jvm
+    - io.kotest:kotest-assertions-core-jvm
+    - io.kotest:kotest-shared-jvm
+    - io.kotest:kotest-common-jvm
+    - io.kotest:kotest-extensions-jvm
+    - io.kotest:kotest-framework-api-jvm
+    - io.kotest:kotest-framework-concurrency-jvm
+    - io.kotest:kotest-framework-discovery-jvm
+    - io.kotest:kotest-framework-engine-jvm
+    - io.kotest:kotest-runner-junit5-jvm
+In both cases, we have installed the same dependencies, so we should include only one of them
+  * org.assertj
+    * assertj-core: https://joel-costigliola.github.io/assertj/assertj-core-quick-start.html
+      * With assertjcore we have better assertion.
+      * Kotest have some assertions
 
+Regarding io.kotest.extensions:kotest-extensions-spring, you need to take into account in the last
+versions of spring you will need it for FreeSpecs tests. In other way, they won't able to load the context.
+https://stackoverflow.com/questions/53277045/how-does-kotlintest-test-spring-boot-application
+
+### Differences in the assertions with assertJ and kotests
+
+Certain different aspects. If you don't want to user assertj, you could remove the dependency
+https://kotest.io/docs/assertions/assertions.html
+
+```
+   @Test
+    fun it_should_be_true_example_classic_springboot_appTest() {
+        assertThat(true).isTrue() // AssertJ
+        true shouldBe true // kotest assertions
+    }
+```
+### The problem with the database
+
+After creating a dummy entity and maybe because we are using flyway, when the context loads, spring boot miss
+a database. With the objective to make it works, we configure it with a H2 database. We will see if we want to 
+change it in the future.
+
+To do this, we should configure the application.yml with:
+
+``` typical configuration
+spring.datasource.driver-class-name= org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:localhost;DB_CLOSE_ON_EXIT=FALSE
+spring.datasource.username= admin
+spring.datasource.password=
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=create
+```
+and you only have to include the following dependency. The driver for h2 in the build.gradle
+
+```
+    implementation 'com.h2database:h2'
+```
+
+These sentences are very important for JPA: 
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=create
+
+In the example we are using H2, and the table will be in memory. So, in this way, the scheme will be 
+self-created depending on the entities
+
+
+You have more information here: https://stackoverflow.com/questions/51221777/failed-to-configure-a-datasource-url-attribute-is-not-specified-and-no-embedd
+### The problem of the login
+
+Well, you have configurated spring boot with security, so, you will need to login to access to the api. You will see, when
+you access to http://localhost:8080, that you will see a screen to login.
+https://spring.io/guides/gs/securing-web/
+https://www.baeldung.com/spring-security-login
+https://reflectoring.io/spring-security/
+
+if we remove the following library
+```
+implementation 'org.springframework.boot:spring-boot-starter-security'
+```
+you won't have the problem, but also you won't have security. In this way you could access to the
+http://localhost:8080/api/dummy and will receive an empty json, as part of the exmaple.
+
+But if you activate the security, you will need to do a basic configuration.
+```
+spring.security.user.name = admin
+spring.security.user.password = admin
+``` 
+In your tests, you will need to user for example :   @WithMockUser(value = "spring")
+
+## Controller tests
+If you have taken into account the previous configurations, you only will have to take into account:
+1. You can double the service, by using an stub. You can use MockkBean instead MockBean, because
+   you are not using already mockito
+2. For the security, you could use @WithMockUser, and you will able to call the endpoint
+3. with mockmvc you will call the controller, testing only the part of the call
+
+``` kotlin
+@WebMvcTest
+@ContextConfiguration(classes = [(ShoppingListBackendKotApplication::class)])
+class ExampleControllerTestClassicSpringBoot(@Autowired val mockMvc: MockMvc) {
+
+    @MockkBean
+    lateinit var dummyService: DummyService
+
+    @WithMockUser(value = "spring")
+    @Test
+    fun this_is_an_example_with_mvc() {
+        every {dummyService.get()} returns DummyEntity()
+        mockMvc.perform(get("http://localhost:8080//api/dummy")).
+            andExpect(status().isOk)
+    }
+}
+```
+For FreeSpecs it is the same thing, but be careful with the configuration of dependencies. See the previous
+recommendations.
+
+## JPA Tests
+
+There are some tips to take into account:
+- We use EnableAutoconfiguration and ComponentScan, because there is an
+  error in intellij, where in spite of working, the error with the autowire
+  and the respository is something that only can be solved with this notations.
+- Review the configuration of the H2, because in other case it is not going to work.
+- The context configuration is neccesary to work.
+@DataJpaTest
+``` kotlin
+@DataJpaTest
+@ContextConfiguration(classes = [(ShoppingListBackendKotApplication::class)])
+@ComponentScan("com.shoppinglist.application.dummy")
+@EnableAutoConfiguration
+class ExampleJPAIntegrationTestClassicSpring {
+    @Autowired
+    lateinit var entityManager: TestEntityManager
+
+    @Autowired
+    lateinit var repository: DummyRepository
+
+    @Test
+    fun dummyExampleOfIntegrationTestWithDB() {
+        val dummyEntity = DummyEntity()
+        entityManager.persist(dummyEntity)
+        entityManager.flush()
+        val theSameDummyEntity = this.repository.findAll().toList();
+        assertThat(theSameDummyEntity.size).isEqualTo(1)
+        assertThat(theSameDummyEntity[0]).isEqualTo(dummyEntity)
+    }
+}
+
+```
 # ktlintFormat and detekt
 
 # Cucumber with spring configuration
