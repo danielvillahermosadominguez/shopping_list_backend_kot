@@ -511,9 +511,80 @@ fi
 NOTE: The only problem that I have found it you need to install the pre-commit using
         .\gradlew installGitHooks
 
+## Detekt
+https://github.com/detekt/detekt
+Detekt is code analysis for kotlin. I supose we will use it for sonarqube.
+With this we look for code smells.
+
+This is the website:
+https://detekt.dev/
+https://detekt.dev/docs/intro/
+https://hofstede-matheus.medium.com/improve-code-quality-with-ktlint-detekt-and-git-hooks-d173722594e4
+
+NOTA: Por ahora no parece interesante instalarlo. Lo dejamos pendiente.
 
 # Cucumber with spring configuration
+1) You need to create the first dummy feature in 
+    src/test/resources/cucumber/features/dummy.feature
 
+``` gherkin
+Feature: Dummy Feature
+
+  Scenario: Dummy Scenario
+    Given a dummy given
+    When a dummy thing happens
+    Then a dummy result happens too
+```
+
+2) We need to create the steps and the runner to work with junit
+```kotlin
+package com.shoppinglist.acceptance
+
+package atm.account.steps
+
+import io.cucumber.junit.Cucumber
+import io.cucumber.junit.CucumberOptions
+import org.junit.runner.RunWith
+
+//https://github.com/jecklgamis/cucumber-jvm-kotlin-example/blob/main/src/test/kotlin/runner/ExampleFeatureTest.kt
+
+@RunWith(Cucumber::class)
+@CucumberOptions(
+    features = ["classpath:cucumber/features/dummy.feature"],
+    glue = ["classpath:com/shoppinglist/acceptance"],
+    plugin = ["pretty", "json:target/jsonReports/acceptance.json", "html:target/cucumber/html", "html:target/cucumber/acceptance.html"]
+)
+class CucumberAppTestRunner
+```
+
+We need some dependencies in our .gradle
+```gherkin    
+    testImplementation 'io.cucumber:cucumber-java:7.11.1'
+    testImplementation 'io.cucumber:cucumber-junit:7.11.1'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.9.2'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.11.1'
+```
+https://github.com/jecklgamis/cucumber-jvm-kotlin-example/blob/main/src/test/kotlin/runner/ExampleFeatureTest.kt
+
+Take into account, cucumber runs with junit 4, and we need compatibility with junit 5,so
+we will need the junit.vintaje and the plarform-engine
+
+In addition, you will ne to take into account the cucumber test, (Aceptance test), will be
+very similar to the application test, so we should configure them for this.
+
+```
+package com.shoppinglist.acceptance
+
+import com.shoppinglist.application.ShoppingListBackendKotApplication
+import io.cucumber.spring.CucumberContextConfiguration
+import org.springframework.boot.test.context.SpringBootTest
+
+
+@CucumberContextConfiguration
+@SpringBootTest(classes = [(ShoppingListBackendKotApplication::class)])
+class CucumberSpringContextConfiguration {
+}
+```
 # Mokkt example
 
 # Wiremock

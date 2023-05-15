@@ -9,13 +9,15 @@
     [x] Integration tests examples - With the controller tests and JPA tests
     [x] Mockt example
     [x] Integration with H2 in memory
+    [x] linters - ktlint + precommit
+    
 ## Backlog
 **Working skeleton:**
-[ ] linters
 [ ] Cucumber example
 [ ] GraphQL example with apollo
 [ ] Wiremock example
 [ ] integration with sonarqube
+[ ] linters - deteckt 
 [ ] Github actions
 [ ] SQLite example
 [ ] CI with github actions**
