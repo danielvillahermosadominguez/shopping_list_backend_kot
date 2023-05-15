@@ -401,6 +401,33 @@ class ExampleJPAIntegrationTestClassicSpring {
 ```
 # ktlintFormat and detekt
 
+## ktlint
+https://github.com/jeremymailen/kotlinter-gradle
+
+You only have to add the plugin
+```gradle
+plugins {
+    ...
+    id 'org.jmailen.kotlinter' version '3.14.0'
+}
+```
+and you will able to execute:
+
+```
+.\gradlew lintkotlin  <-- it will only report the format problems 
+.\gradle formatKotlin <- it will change the format
+```
+
+In addition, you could create a hoock for Git. Adding the following
+in the build.gradle
+```gradle
+tasks.named('check') {
+    dependsOn 'installKotlinterPrePushHook'
+}
+```
+This hook, will execute the lintKotlin and if there are errors, formatKotlin.
+
+
 # Cucumber with spring configuration
 
 # Mokkt example
