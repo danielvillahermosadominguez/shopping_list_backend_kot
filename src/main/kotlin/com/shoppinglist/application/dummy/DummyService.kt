@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class DummyService(
-    @Autowired val repository: DummyRepository
+    @Autowired val repository: DummyRepository,
 ) {
     fun getAll() = this.repository.findAll()
 }

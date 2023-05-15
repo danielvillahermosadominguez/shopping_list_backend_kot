@@ -427,7 +427,68 @@ tasks.named('check') {
 ```
 This hook, will execute the lintKotlin and if there are errors, formatKotlin.
 
+the problem I have found with this approach is if you execute .\gradlew test, it has stopped
+working.
+## ktlint - another way to configure your project
+A new dependency in the build.gradle
 
+```
+...
+configurations {
+    ktlint
+}
+
+...
+
+dependencies {
+runtimeOnly 'com.pinterest.ktlint:ktlint-core:0.49.1'
+
+..
+}
+...
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "src/**/*.kt"
+}
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "-F", "src/**/*.kt"
+}
+```
+And with this, you could execute : "gradlew ktlint" and "gradlew ktlintFormat"
+
+With java > 16 you are going to have some problems and you should change certain things
+in the ktlintFormat to work properly:
+
+``` gradle
+...
+task ktlintFormat(type: JavaExec, group: "verification") {
+jvmArgs "--add-opens", "java.base/java.lang=ALL-UNNAMED"
+description = "Fix Kotlin code style deviations."
+classpath = configurations.ktlint
+mainClass = "com.pinterest.ktlint.Main"
+args "-F", "src/**/*.kt"
+}
+```
+
+In addition, you could add a pre-commit:
+
+```
+task installGitHooks(type: Copy, group: "git-hooks") {
+    from new File(rootProject.rootDir, 'scripts/pre-commit')
+    into { new File(rootProject.rootDir, '.git/hooks')}
+    fileMode 0775
+}
+check.dependsOn installGitHooks
+...
+<Inmediatly after the task of ktlint, include>
+check.dependsOn ktlint
+```
 # Cucumber with spring configuration
 
 # Mokkt example

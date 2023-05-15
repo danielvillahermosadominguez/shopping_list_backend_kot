@@ -21,6 +21,7 @@
 [ ] CI with github actions**
 [ ] Docker image
 [ ] Deployment in a webapp
+[ ] log
 **Outside in shopping list**
 
     [ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc

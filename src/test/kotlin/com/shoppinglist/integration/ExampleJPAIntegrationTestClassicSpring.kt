@@ -28,7 +28,7 @@ class ExampleJPAIntegrationTestClassicSpring {
         val dummyEntity = DummyEntity()
         entityManager.persist(dummyEntity)
         entityManager.flush()
-        val theSameDummyEntity = this.repository.findAll().toList();
+        val theSameDummyEntity = this.repository.findAll().toList()
         assertThat(theSameDummyEntity.size).isEqualTo(1)
         assertThat(theSameDummyEntity[0]).isEqualTo(dummyEntity)
     }

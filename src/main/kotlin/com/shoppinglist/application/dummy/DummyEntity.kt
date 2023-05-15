@@ -7,7 +7,5 @@ import org.springframework.data.annotation.Id
 
 @Entity
 class DummyEntity(
-    @jakarta.persistence.Id @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
-) {
-}
-
+    @jakarta.persistence.Id @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null,
+)

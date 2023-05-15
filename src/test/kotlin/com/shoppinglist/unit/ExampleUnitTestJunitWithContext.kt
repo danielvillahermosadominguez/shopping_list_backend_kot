@@ -6,7 +6,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration
 class ExampleUnitTestJunitWithContext {
     @Test
-    fun `it should be true` () {
-        assert(true);
+    fun `it should be true`() {
+        assert(true)
     }
 }
