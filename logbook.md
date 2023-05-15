@@ -10,10 +10,9 @@
     [x] Mockt example
     [x] Integration with H2 in memory
     [x] linters - ktlint + precommit
-    
+    [x] Cucumber example
 ## Backlog
 **Working skeleton:**
-[ ] Cucumber example
 [ ] GraphQL example with apollo
 [ ] Wiremock example
 [ ] integration with sonarqube
