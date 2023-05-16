@@ -29,4 +29,7 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
     - name: Run tests
-      run: ./gradlew test
+      run: |
+        chmod +x gradlew
+        ./gradlew clean test
+
