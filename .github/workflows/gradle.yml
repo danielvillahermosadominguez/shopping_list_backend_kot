@@ -31,5 +31,5 @@ jobs:
     - name: Run tests
       run: |
         chmod +x gradlew
-        ./gradlew clean test
+        ./gradlew clean ktlint test
 
