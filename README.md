@@ -585,11 +585,105 @@ import org.springframework.boot.test.context.SpringBootTest
 class CucumberSpringContextConfiguration {
 }
 ```
-# Mokkt example
+
+# Jacoco coverage
+For this, you will need to include code in your build.gradle
+
+https://medium.com/@ranjeetsinha/jacoco-with-kotlin-dsl-f1f067e42cd0
+https://docs.gradle.org/current/userguide/jacoco_plugin.html
+
+``` gradle
+..
+plugins {
+  ...
+    id 'jacoco'
+}
+...
+
+jacocoTestReport {
+    dependsOn test
+    executionData tasks.withType(Test).findAll { it.state.executed }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [])
+        }))
+    }
+    reports {
+        xml.setEnabled(true)
+        html.setEnabled(true)
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    executionData tasks.withType(Test).findAll { it.state.executed }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [])
+        }))
+    }
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                minimum = 0.8
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.8
+            }
+            limit {
+                counter = 'LINE'
+                minimum = 0.8
+            }
+            limit {
+                counter = 'METHOD'
+                minimum = 0.8
+            }
+            limit {
+                counter = 'CLASS'
+                minimum = 0.8
+            }
+        }
+    }
+}
+```
+
+And now, you could execute:
+```ssh
+.\gradlew test --> the coverage will be generated in the build/jacoco folder
+.\gradle jacocoTestReport --> the reports will be generated in html in the build/jacocoHTML
+.\gradlew jacocoTestCoverageVerification --> you could use some quality gates.
+```
+
+
+# Sonarqube
+You will need to create a sonar-project properties
+
+```
+sonar.projectKey=danielvillahermosadominguez_shopping_list_backend_kot
+sonar.organization=danielvillahermosadominguez
+
+sonar.projectName=shopping_list_backend_kot
+sonar.projectVersion=latest
+
+sonar.sources=src/main/kotlin
+sonar.tests=src/test/kotlin
+sonar.language=java
+sonar.sourceEncoding=UTF-8
+
+sonar.coverage.jacoco.xmlReportPaths= build/reports/jacoco/test/jacocoTestReport.xml
+sonar.junit.reportsPath=build/test-results/test/TEST-*.xml
+#sonar.coverage.exclusions=src/main/kotlin
+
+```
+
+And
 
 # Wiremock
 
-# Sonarqube
+
 
 # linter
 
