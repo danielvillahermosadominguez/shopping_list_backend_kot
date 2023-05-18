@@ -28,8 +28,13 @@ jobs:
       with:
         java-version: '18'
         distribution: 'temurin'
-    - name: Run tests
+    - name: Run tests and coverage
       run: |
         chmod +x gradlew
-        ./gradlew clean ktlint test
+        ./gradlew clean ktlint jacocoTestReport
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
