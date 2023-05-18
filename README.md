@@ -679,7 +679,9 @@ sonar.junit.reportsPath=build/test-results/test/TEST-*.xml
 
 ```
 
-And
+And if you want to include it in github actions
+
+## Github actions with sonarqube
 
 # Wiremock
 

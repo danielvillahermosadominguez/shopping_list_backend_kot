@@ -12,6 +12,46 @@
     [x] linters - ktlint + precommit
     [x] Cucumber example
     [x] CI with github actions**
+    [x] sonarqube properties and jacoco coverage
+    [x] integration with sonarqube and jacoco coverage with CI
+## Backlog
+**Working skeleton:**
+
+    [ ] GraphQL example with apollo
+    [ ] Wiremock example
+    [ ] linters - deteckt 
+    [ ] SQLite example
+    [ ] Docker image
+    [ ] Deployment in a webapp
+    [ ] log
+**Outside in shopping list**
+
+    [ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc
+
+**Dockerization**
+
+**CD with github actions and azure**
+
+**Integration with front app**
+
+    [ ] Deployment
+
+**Database with postgree**
+
+# 17/05/2023
+
+## Done
+
+**Preparation of the project:** working skeleton approach
+
+    [x] Creation of a spring boot project with kotlin and gradle
+    [x] Some examples unit tests with freespecs and junit4/5
+    [x] Integration tests examples - With the controller tests and JPA tests
+    [x] Mockt example
+    [x] Integration with H2 in memory
+    [x] linters - ktlint + precommit
+    [x] Cucumber example
+    [x] CI with github actions**
     [x] sonarqube properties and jacoco coverage 
 ## Backlog
 **Working skeleton:**

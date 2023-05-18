@@ -33,7 +33,7 @@ jobs:
         chmod +x gradlew
         ./gradlew clean ktlint jacocoTestReport
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+      run: ./gradlew sonar
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
