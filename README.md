@@ -683,6 +683,121 @@ And if you want to include it in github actions
 
 ## Github actions with sonarqube
 
+
+# Docker image
+
+We are going to use for docker, a base with jdk 18. This will be:
+https://hub.docker.com/layers/library/openjdk/18-jdk-alpine3.14/images/sha256-4f88ea57de45e1da177f4ed66ab5cfcffedc499cc0500600219fd56921b92db3
+
+So we need to create a file "Dockerfile" where we can write the following:
+
+```dockerfile
+FROM openjdk:18-jdk-alpine3.14
+
+WORKDIR /app
+
+COPY . /app
+
+RUN ./gradlew build
+
+EXPOSE 8080
+
+CMD sh start.sh
+```
+
+We are going to do for this example, the same we would do in our local. We will see other beter way to
+do it in the future.
+
+As we see we base our docker image in jdk-19 and we copy all the folder to this image (code, binaries, everything. This is not
+the best way to do it, but for our first docker image will be enough)
+
+We will expose the 8080 port because our service, will use the port 8080 and we will want to use
+it when we run the image
+
+An we have other script which will be executed when the docker container will start. This script do
+the following:
+
+```sh
+
+#!/bin/bash
+
+  
+# Start the second process
+./gradlew bootRun
+  
+# Wait for any process to exit
+wait -n
+  
+# Exit with status of process that exited first
+exit $?
+```
+
+As we would execute in local, we execute with bootRun the spring application. Starting the service
+Remember that you will need to have the docker daemon running. In windows, it is to have the docker desktop
+running.
+
+To do it, better, you will need to see: https://spring.io/guides/topicals/spring-boot-docker/
+
+And now the idea is:
+1) Create the image : "docker build ." and you will receive the hash of the image
+
+if we execute "docker images" we will see a new image with "repostitory" = <none> and "TAG" = <none> and
+with a image id.
+
+You could run this image by using: "docker run -d -p 8080:8080 <image id>"
+
+Another useful commands
+```sh
+# delete an image
+docker image rm <has>
+docker run image sh --> entras en la imagen
+docker exec -it <id> sh --> entrar en la imagen con sh
+docker run -d image <-- without blocking the terminal
+docker ps --> containers
+docker run -p 8080:8080 -it 43a68be47c92 sh <-- entrar con sh y mapeo de puerto
+docker system prune --> remove all the containes and images which are nos being used
+docker stop <id> --> for containers
+docker start <id> --> for containers
+```
+2) We could build it with a tag (we can do it instead of 1. )
+
+docker build -t shoppinglist_backend_kotlin .
+
+3) We could run the docker image and test it is working, by accessing to the url:
+    https://localhost:8080
+   docker run -p 8080:8080 -d shoppinglist_backend_kotlin
+You will see the login of Spring Boot
+
+4) The next step is to include it in github actions and deploy in the container. In our case, 
+   we will do it in Azure, in a container register.
+
+``` 
+...
+- name: Docker Login
+      uses: docker/login-action@v2.1.0
+      with:
+          registry: ${{secrets.ACR_ENDPOINT}}
+          username: ${{ secrets.ACR_USERNAME}}
+          password: ${{ secrets.ACR_PASSWORD}}
+    - name: Build and push docker image
+      uses: docker/build-push-action@v4.0.0
+      with:
+          context: .
+          push: true
+          tags: ${{ secrets.ACR_ENDPOINT }}
+..
+
+```
+
+You will need to create a continaer register in azure or reuse one of them
+
+You will need to create theses secrets:
+- ACR_ENDPOINT => shoppinglistregister.azurecr.io/shoppinglistbackend:latest
+- ACR_USERNAME => You can find it in the register, in access keys
+- ACR_PASSWORD => You can find it in the register, in access keys
+
+
+
 # Wiremock
 
 
