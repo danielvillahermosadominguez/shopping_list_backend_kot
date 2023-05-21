@@ -796,7 +796,18 @@ You will need to create theses secrets:
 - ACR_USERNAME => You can find it in the register, in access keys
 - ACR_PASSWORD => You can find it in the register, in access keys
 
+5) Pull the image in your local and execute it.
 
+You will need to log in azure for this:
+
+az login
+az acr login --name shoppinglistregister.azurecr.io
+docker pull shoppinglistregister.azurecr.io/shoppinglistbackend:latest
+docker run -d -p 8080:8080 shoppinglistregister.azurecr.io/shoppinglistbackend:latest
+
+test it is running in https://localhost:8080
+
+:-) and that's all
 
 # Wiremock
 
