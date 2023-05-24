@@ -809,11 +809,69 @@ test it is running in https://localhost:8080
 
 :-) and that's all
 
+# Deployment in webApp Azure
+
+1) You need to create the webservice in azure
+2) You need to create the credentials to access to azure:
+   https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux
+   If you have one, you could use it.
+   If you need get it, you can use:
+```
+az ad sp create-for-rbac --name "cicd2" --role contributor --scopes /subscriptions/5f983a34-8f24-40dc-978e-35d5a138adf9/resourceGroups/appshoppinglistapi_group  --sdk-auth
+```
+You need to store the json, it will be the AZ_CREDENTIALS. 
+
+3) In github actions create a job with the deployment
+``` yaml
+  deploy:
+    runs-on: ubuntu-latest
+    needs:  test-and-build    
+    permissions:
+      id-token: write
+      contents: read
+    steps:      
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZ_CREDENTIALS }}              
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_APP_SERVICE_NAME }} 
+          images: ${{ secrets.ACR_ENDPOINT }}
+      - name: Azure logout
+        run:
+          az logout
+```
+And you need to create this secrets in actions secrets (github):
+ * AZ_CREDENTIALS = json we have created
+ * AZURE_APP_SERVICE_NAME = appshoppinglistapi
+ * ACR_ENDPOINT = shoppinglistregister.azurecr.io/shoppinglistbackend:latest
+
+With all of this, if you open https://appshoppinglistapi.azurewebsites.net/login,
+you will see the login and password request.
+# Environment 
+You need to include this, in the application.properties
+```
+spring.config.import=optional:file:.env[.properties]
+```
+https://www.baeldung.com/kotlin/read-env-variables
+``` java
+val env = System.getenv("HOME")
+assertNotNull(env)
+```
+NOTE: I haven't gotten to use it with a .env file. It is not working.
+https://www.baeldung.com/spring-boot-properties-env-variables
+https://stackoverflow.com/questions/73053852/spring-boot-env-variables-in-application-properties
+
+Although you could try to use it:
+https://github.com/paulschwarz/spring-dotenv
+``` gradle
+implementation 'me.paulschwarz:spring-dotenv:2.3.0'
+configurations.testImplementation.exclude(group: 'me.paulschwarz', module: 'spring-dotenv')
+```
 # Wiremock
 
 
-
-# linter
 
 # graphql
 
