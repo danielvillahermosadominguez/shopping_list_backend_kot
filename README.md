@@ -869,6 +869,67 @@ https://github.com/paulschwarz/spring-dotenv
 implementation 'me.paulschwarz:spring-dotenv:2.3.0'
 configurations.testImplementation.exclude(group: 'me.paulschwarz', module: 'spring-dotenv')
 ```
+
+With this, the best approach are the following cases:
+1) Be sure your app is going to scan the packages. For example, if we use
+   other folder for the class which will contain the configuration we should:
+``` gradle
+@SpringBootApplication(scanBasePackages = ["com.shoppinglist.application", "com.shoppinglist.configuration"])
+class ShoppingListBackendKotApplication
+
+fun main(args: Array<String>) {
+    runApplication<ShoppingListBackendKotApplication>(*args)
+}
+```
+
+2) You will need to create a configuration class
+```gradle
+@Configuration
+@ConfigurationPropertiesScan
+class AppConfiguration(
+    @Value("\${environment.exampleVariable}") private val exampleVariable: String?,
+) {
+    fun getExampleVariable():String? = exampleVariable
+}
+```
+
+3) You should get the variables in your application.properties
+```
+...
+environment.exampleVariable=${EXAMPLE_VARIABLE}
+..
+```
+4) where you .env file contains
+```
+EXAMPLE_VARIABLE=Example
+```
+In addition, you will need to take into account, if you have the configuration in a folder
+out of the main folder, you will need to scan these packages for the autowire.
+
+Other solution is to have this structure of packages:
+```
+com.shoppinglist
+    +application
+        +dummy
+            ....
+        + configuration
+            AppConfiguration
+        ShoppingListBackendKotApplication.kt
+```
+But if you have other folder out of the application, you will need:
+
+``
+@SpringBootApplication(scanBasePackages = ["com.shoppinglist.application", "com.shoppinglist.configuration"])
+class ShoppingListBackendKotApplication
+``
+
+And at the end, to access to this properties
+
+```
+ @Autowired
+  private val appConfiguration: AppConfiguration? = null
+```
+
 # Wiremock
 
 
