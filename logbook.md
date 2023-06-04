@@ -1,4 +1,4 @@
-# 30-31/05/2023
+# 30-31/05/2023 -4/06/2023
 
 ## Done
 
@@ -17,16 +17,15 @@
     [x] Docker image, github actions and deployment it in the container register
     [x] Deployment in a webapp
     [x] Environment configuration
-    [ ] Wiremock example
-    We start it from Zero
+    [X] Wiremock example
+    [ ] Swagger
 ## Backlog
 **Working skeleton:**
-
 [ ] GraphQL example with apollo
-[ ] Swagger
 [ ] linters - deteckt
 [ ] SQLite example
 [ ] log
+[ ] Terraform
 **Outside in shopping list**
 
     [ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc

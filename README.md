@@ -931,9 +931,53 @@ And at the end, to access to this properties
 ```
 
 # Wiremock
+## Without the support of junit or spring configuration
+https://www.baeldung.com/introduction-to-wiremock
+https://github.com/wiremock/wiremock
+
+Basicly, to start with wiremock you need to include this dependency:
+```
+testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
+```
+
+```
+WireMockServer wireMockServer = new WireMockServer(String host, int port);
+
+```
+
+Seems there is some no compatibility with spring boot:
+https://groups.google.com/g/wiremock-user/c/knTaDyBY70Q
+
+You need to use the version Beta to avoid these problems:
+```
+ testImplementation 'com.github.tomakehurst:wiremock:3.0.0-beta-8'
+```
 
 
+https://howtodoinjava.com/spring-boot2/resttemplate/resttemplate-get-example/
 
+You will need to create a simple test class and include:
+```
+wireMockServer = WireMockServer(<port>) -> to create the instance of mockserver
+wireMockServer.start()
+wireMockServer.stop()
+wireMockServer!!.resetRequests()
+wireMockServer!!.verify(1, getRequestedFor(urlEqualTo("/dummyIntegration")))
+```
+
+You have an example in Test->Integration->ExampleWiremockWithoutSupportOfFrameworks
+
+## with kotest extension
+https://wiremock.org/docs/solutions/kotlin/
+https://github.com/kotest/kotest-extensions-wiremock
+
+## with spring boot
+https://wiremock.org/docs/solutions/spring-boot/
+https://medium.com/cuddle-ai/testing-spring-boot-application-using-wiremock-and-junit-5-d514a47ab931
+
+# Swagger
+https://www.tutorialspoint.com/spring_boot/spring_boot_enabling_swagger2.htm
+https://www.baeldung.com/kotlin/swagger-spring-rest-api
 # graphql
 
 # security
