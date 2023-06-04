@@ -17,8 +17,8 @@
     [x] Docker image, github actions and deployment it in the container register
     [x] Deployment in a webapp
     [x] Environment configuration
-    [X] Wiremock example
-    [ ] Swagger
+    [x] Wiremock example
+    [x] Swagger
 ## Backlog
 **Working skeleton:**
 [ ] GraphQL example with apollo

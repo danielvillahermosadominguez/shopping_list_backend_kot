@@ -978,6 +978,22 @@ https://medium.com/cuddle-ai/testing-spring-boot-application-using-wiremock-and-
 # Swagger
 https://www.tutorialspoint.com/spring_boot/spring_boot_enabling_swagger2.htm
 https://www.baeldung.com/kotlin/swagger-spring-rest-api
+https://levelup.gitconnected.com/adding-swagger-to-kotlin-spring-48b930e03ed5
+
+You will need to include:
+```
+implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3')
+```
+
+And you will access with:  http://localhost:8080/swagger-ui.html
+
+Also you can configurate it with a special configuration.
+
+You could include in the application.properties:
+```yaml
+springdoc.swagger-ui.path=/swagger-ui.html
+```
+
 # graphql
 
 # security

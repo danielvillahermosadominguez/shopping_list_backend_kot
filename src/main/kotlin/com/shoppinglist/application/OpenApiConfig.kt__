@@ -1,0 +1,42 @@
+/*
+package com.shoppinglist.application
+
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+import io.swagger.v3.oas.annotations.servers.Server
+import io.swagger.v3.oas.models.OpenAPI
+import java.util.List
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+class OpenAPIConfig {
+    @Value("\${bezkoder.openapi.dev-url}")
+    private val devUrl: String? = null
+
+    @Value("\${bezkoder.openapi.prod-url}")
+    private val prodUrl: String? = null
+    @Bean
+    fun myOpenAPI(): OpenAPI {
+        val devServer = Server()
+        devServer.url = devUrl
+        devServer.description = "Server URL in Development environment"
+        val prodServer = Server()
+        prodServer.setUrl(prodUrl)
+        prodServer.setDescription("Server URL in Production environment")
+        val contact = Contact()
+        contact.setEmail("bezkoder@gmail.com")
+        contact.setName("BezKoder")
+        contact.setUrl("https://www.bezkoder.com")
+        val mitLicense: License = License().name("MIT License").url("https://choosealicense.com/licenses/mit/")
+        val info: Info = Info()
+            .title("Tutorial Management API")
+            .version("1.0")
+            .contact(contact)
+            .description("This API exposes endpoints to manage tutorials.")
+            .termsOfService("https://www.bezkoder.com/terms")
+            .license(mitLicense)
+        return OpenAPI().info(info).servers(List.of(devServer, prodServer))
+    }
+}*/
