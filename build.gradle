@@ -3,12 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.22'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.7.22'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'com.adarshr.test-logger' version '3.2.0'
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
+    id "io.gitlab.arturbosch.detekt" version "1.23.0"
 }
 
 group = 'com.shoppinglist'
@@ -24,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0'
     ktlint "com.pinterest:ktlint:0.49.1"
     // Align versions of all Kotlin components
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
@@ -155,4 +157,9 @@ sonar {
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.junit.reportsPath", "build/test-results/test/TEST-*.xml"
     }
+}
+
+detekt {
+    config = files("$projectDir/config/detekt/detekt.yml")
+    input = files("src/main/java", "src/main/kotlin")
 }

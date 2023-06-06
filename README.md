@@ -520,8 +520,43 @@ This is the website:
 https://detekt.dev/
 https://detekt.dev/docs/intro/
 https://hofstede-matheus.medium.com/improve-code-quality-with-ktlint-detekt-and-git-hooks-d173722594e4
+https://plugins.gradle.org/plugin/io.gitlab.arturbosch.detekt
 
-NOTA: Por ahora no parece interesante instalarlo. Lo dejamos pendiente.
+Configuramos el .build
+```
+plugins {
+    ..
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21' <-- make a look to the version
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21' <-- make a look to the version
+    ...
+    id "io.gitlab.arturbosch.detekt" version "1.23.0"
+}
+
+...
+dependencies {
+    implementation 'io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0'
+    ...
+    
+}
+
+
+detekt {
+    config = files("$projectDir/config/detekt/detekt.yml")
+    input = files("src/main/java", "src/main/kotlin")
+}
+```
+And you will need to create a empty file in config/detekt/detekt.yml
+
+You will create the rules here
+
+You have more information in: https://detekt.dev/docs/introduction/configurations/
+
+You can execute with:
+
+```
+.\gradlew detekt
+
+```
 
 # Cucumber with spring configuration
 1) You need to create the first dummy feature in 
