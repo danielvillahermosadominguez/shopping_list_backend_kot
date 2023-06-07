@@ -20,11 +20,12 @@
     [x] Environment configuration
     [x] Wiremock example
     [x] Swagger
-    [ ] log
+    [x] log
+    [x] SQLite example
 ## Backlog
 **Working skeleton:**
 [ ] GraphQL example with apollo
-[ ] SQLite example
+
 
 
 **Outside in shopping list**

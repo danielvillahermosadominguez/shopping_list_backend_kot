@@ -36,9 +36,12 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3')
     implementation 'io.github.microutils:kotlin-logging-jvm:3.0.5'
+    implementation 'org.xerial:sqlite-jdbc:3.40.1.0'
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+
     configurations.testImplementation.exclude(group: 'me.paulschwarz', module: 'spring-dotenv')
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

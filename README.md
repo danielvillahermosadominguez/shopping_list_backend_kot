@@ -1095,13 +1095,51 @@ fun main(args: Array<String>) {
 }
 
 ```
+
+# SQLite
+https://adinugroho.medium.com/using-sqlite-with-spring-boot-kotlin-73b365f6c576
+https://www.baeldung.com/spring-boot-sqlite
+You must to include this dependencies
+```
+    implementation 'org.xerial:sqlite-jdbc:3.40.1.0'
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+```
+
+And in the environment .env
+```yaml
+#SQLITE Configuration
+SPRING_JPA_DATABASE_PLATFORM=org.hibernate.community.dialect.SQLiteDialect
+SPRING_JPA_HIBERNATE_DDL_AUTO=update
+SPRING_DATASOURCE_URL=jdbc:sqlite:mydb.sqlite
+SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.sqlite.JDBC
+SPRING_DATASOURCE_USERNAME=admin
+SPRING_DATASOURCE_PASSWORD=admin
+SPRING_JPA_GENERATE_DLL=true
+#H2 Configuration
+#SPRING_JPA_DATABASE_PLATFORM=
+#SPRING_JPA_HIBERNATE_DDL_AUTO=create
+#SPRING_DATASOURCE_URL=jdbc:h2:mem:localhost;DB_CLOSE_ON_EXIT=FALSE
+#SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+#SPRING_DATASOURCE_USERNAME=admin
+#SPRING_DATASOURCE_PASSWORD=
+#SPRING_JPA_GENERATE_DLL=true
+```
+
+and in the application.properties
+```
+spring.datasource.driver-class-name= ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username= ${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+spring.jpa.generate-ddl=${SPRING_JPA_GENERATE_DLL}
+spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO}
+```
 # graphql
 
 # security
 
 # migrations
 
-# SQLite
 
 # Postgree
 
