@@ -1,4 +1,4 @@
-# 06/05/2023 
+# 06/05/2023-07/05/2023 
 
 ## Done
 
@@ -20,11 +20,12 @@
     [x] Environment configuration
     [x] Wiremock example
     [x] Swagger
+    [ ] log
 ## Backlog
 **Working skeleton:**
 [ ] GraphQL example with apollo
 [ ] SQLite example
-[ ] log
+
 
 **Outside in shopping list**
 

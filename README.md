@@ -1028,7 +1028,73 @@ You could include in the application.properties:
 ```yaml
 springdoc.swagger-ui.path=/swagger-ui.html
 ```
+# Logs
+https://www.baeldung.com/kotlin/kotlin-logging-library
 
+We need to include:
+```
+implementation 'io.github.microutils:kotlin-logging-jvm:3.0.5'
+```
+create a file logback-spring.xml in main->kotlin->resources with the following code:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %replace(%msg){'Bearer [^ ]+', '*****'}%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter
+                    class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <!-- <prettyPrint>true</prettyPrint> -->
+            </jsonFormatter>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+        </layout>
+    </appender>
+
+    <springProfile name="!production">
+        <root name="logger" level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <springProfile name="production">
+        <!-- just exemplary, change to what suits your needs in production usage -->
+        <root name="logger" level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <logger name="com.shoppinglist" level="INFO"/>
+</configuration>
+```
+
+You could create a helper:
+```kotlin
+fun makeLogger(func: () -> Unit): KLogger {
+    func() // for test coverage
+    return KotlinLogging.logger(func)
+}
+
+```
+
+And call it in everywhere:
+```kotlin
+private val logger = makeLogger {}
+    ...
+class ShoppingListBackendKotApplication
+
+fun main(args: Array<String>) {
+    logger.info("STARTING APPLICATION....")
+    runApplication<ShoppingListBackendKotApplication>(*args)
+    logger.info("RUNNING APPLICATION....")
+}
+
+```
 # graphql
 
 # security
