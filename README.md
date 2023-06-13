@@ -1134,12 +1134,402 @@ spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 spring.jpa.generate-ddl=${SPRING_JPA_GENERATE_DLL}
 spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO}
 ```
-# graphql
+# graphql - (doesn't work - see the following section)
+https://medium.com/expedia-group-tech/apollo-federation-in-a-graphql-kotlin-server-115cea51607a
+https://opensource.expediagroup.com/graphql-kotlin/docs/
+https://spring.io/guides/gs/graphql-server/
+https://github.com/spring-guides/gs-graphql-server
+https://pusher.com/blog/writing-graphql-service-using-kotlin-spring-boot/#adding-mutations
+https://spring.io/guides/gs/graphql-server/
+https://stackoverflow.com/questions/74833245/springboot-3-and-graphql-compatibility
+https://levelup.gitconnected.com/how-to-use-graphql-with-spring-boot-7a4d66ed84d7
+Parece que entre versiones hay una historia:
+https://spring.io/blog/2022/05/19/spring-for-graphql-1-0-release
+https://blog.devgenius.io/graphql-with-spring-boot-starter-graphql-7b406998c0b5
 
+Course:
+https://www.youtube.com/watch?v=BuPItqaVeGo&list=PLZV0a2jwt22slmUC9iwGGWfRQRIhs1ELa
+
+The libraries which are used in some projects are:
+```
+ // GraphQL
+    implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:${graphQLStarterVersion}") {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-actuator'
+    }
+    runtimeOnly("com.graphql-java-kickstart:voyager-spring-boot-starter:${graphQLStarterVersion}") {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-actuator'
+    }
+    runtimeOnly("com.graphql-java-kickstart:playground-spring-boot-starter:${graphQLStarterVersion}") {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-actuator'
+    }
+    testImplementation("com.graphql-java-kickstart:graphql-spring-boot-starter-test:${graphQLStarterVersion}") {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-actuator'
+    }
+    implementation 'com.graphql-java:graphql-java-extended-scalars:16.0.1'
+    implementation ('com.graphql-java:graphql-java-extended-validation:16.0.0') {
+        exclude group: 'org.hibernate', module: 'hibernate-validator'
+    }
+```
+in this website is explained step by step: https://www.graphql-java-kickstart.com/
+
+This library : com.garphql-java-kcickstart allow us to use graphql to build our graphql-java schema. The motivation
+to use this library is:
+* Schema first. The schema will be portable
+* Minimal boilerplate: the dtos will be works with the schemas, you don't have to maintain both things.
+* Type discovery or class discovery of mutations and queries.
+* Class validation.
+* Unit testing. You graphql schema is independent of your data model, this makes your classes simple and extremely
+  testeable
+
+To start with kotlin and spring boot, they show you this link: https://github.com/graphql-java-kickstart/graphql-spring-boot
+
+To know what is your kotlin version you will need:
+(https://discuss.kotlinlang.org/t/how-do-i-know-which-kotlin-used/25178)
+```bash
+kotlinc -version
+info: kotlinc-jvm 1.8.0 (JRE 18.0.1.1+2-6)
+```
+
+In addition, in you build.gradle could see the following plugins:
+``` 
+  id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+  id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
+```
+
+According this documentation, you should need to have the kotlin version in you gradle.properties. This file
+you can have in serveral places, the first found in one of these locations wins:
+- in the directory of GRADLE_USER_HOME
+- in the project directory 
+- in the graddle installation directory
+For example, in our case, we don't have this gradle.properties in any of these directories, but have you seen,
+we have the libraries with the 1.8.x in the build.gradle and we have installed kotlin in
+- C:\tools\kotlin\kotlinc\bin\kotlinc
+- we have a KOTLIN_HOME variable pointing to this directory
+- And our gradle is in local installed, but we use the wrapper in the directory with 
+  the gradle-wrapper.properties with the 7.5.1
+
+Regarding our spring version, is the 3.0.6. Because we are establishing it int he build.gradle
+in the plugins:
+```
+plugins {
+id 'org.springframework.boot' version '3.0.6'
+...
+
+```
+
+After to take it into account you will need:
+
+1) Include the graphql libraries
+
+``` kotlin
+dependencies {
+  implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:15.0.0' 
+  // testing facilities
+  testImplementation 'com.graphql-java-kickstart:graphql-spring-boot-starter-test:15.0.0'
+}
+```
+
+2) Enable the graphQL servelet
+
+the servlet is accessible in /graphql when the dependencies has been added and a
+graphql schema can be automatically created when a suppoerted schema library is found in the
+classpath
+So you will need to include this in the application.properties or application.yml
+
+``` yaml
+graphql:
+  servlet:
+    # Sets if GraphQL servlet should be created and exposed. If not specified defaults to "true".
+    enabled: true
+    # Sets the path where GraphQL servlet will be exposed. If not specified defaults to "/graphql"
+    mapping: /graphql
+    cors-enabled: true
+    cors:
+      allowed-origins: http://some.domain.com
+      allowed-methods: GET, HEAD, POST
+    # if you want to @ExceptionHandler annotation for custom GraphQLErrors
+    exception-handlers-enabled: true
+    context-setting: PER_REQUEST_WITH_INSTRUMENTATION
+    # Sets if asynchronous operations are supported for GraphQL requests. If not specified defaults to true.
+    async-mode-enabled: true
+```
+
+An example
+```yaml
+graphql:
+  tools:
+    schema-location-pattern: "**/*.graphqls"
+    # Enable or disable the introspection query. Disabling it puts your server in contravention of the GraphQL
+    # specification and expectations of most clients, so use this option with caution
+    schema-parser-options:
+      introspection-enabled: true
+  playground:
+    enabled: ${env.ENABLE_GRAPHQL_PLAYGROUND:false}
+    mapping: /playground
+    settings:
+      schema:
+        disable-comments: false
+  servlet:
+    async-timeout: 60000
+    cors:
+      allowed-origins: '*'
+      allowed-methods: GET, HEAD, POST
+    websocket:
+      enabled: true
+
+```
+
+for our, application.properties
+```
+graphql.tools.schema-location-pattern= "**/*.graphqls"
+# Enable or disable the introspection query. Disabling it puts your server in contravention of the GraphQL
+# specification and expectations of most clients, so use this option with caution
+graphql.tools.schema-parser-options=
+graphql.tools.introspection-enabled= true
+graphql.tools.playground.enabled= ${env.ENABLE_GRAPHQL_PLAYGROUND:false}
+graphql.tools.playground.mapping= /playground
+graphql.tools.playground.settings.schema.disable-comments= false
+graphql.tools.servlet.async-timeout= 60000
+graphql.tools.servlet.cors.allowed-origins= '*'
+graphql.tools.servlet.cors.allowed-methods= GET, HEAD, POST
+graphql.tools.servlet.websocket.enabled= true
+```
+
+if you include a new variable in your .env file: ENABLE_GRAPHQL_PLAYGROUND = true
+
+you could activate the https://www.gatsbyjs.com/docs/how-to/querying-data/running-queries-with-graphiql/
+what is an interface to develop with
+graphql.graphiql.enabled = true
+/graphiql but your server should be available.
+
+On the other hand, the playground should be available in /playground
+By default:
+/playground
+/graphql
+/subscriptions
+
+It is suppose, the playground is activated by default adding the dependencies
+
+
+NOTA: CREO QUE AQUI HAY UN PROBLEMA DE INCOMPATGIBILIDAD Y NO TENGO CLARO
+SI PUEDO METER EL PLAYGROUND. EN SCENTMATE CREO QUE USAN VERSION ANTERIOR.
+
+AHORA MISMO PARECE, QUE NO SE QUE COGE EL GRAPQL POR POST, PERO ME GUSTARIA 
+METER EL PLAYGROUND.
+
+TODO LO QUE HE ESCRITO ANTES DE ESTO NO TENGO CLARO QUE SIRVA DE ALGUNA GUIA
+MIRARL LOS LINKS
+
+AQUI HAY UN TUTORIAL MUY COMPLETO, PERO CON LA VERSION ANTERIOR, AUNQUE QUIZA
+EMPOLLARLO ESTE BIEN
+
+Por otro lado he encontrado esto para la version 3 de spring: https://howtodoinjava.com/spring-boot/spring-boot-graphql-tutorial/
+
+De hecho aqui funciona el http://localhost:8080/graphiql
+
+
+You could have
+
+# graphql - (for spring 3.x)
+https://howtodoinjava.com/spring-boot/spring-boot-graphql-tutorial/
+https://stackoverflow.com/questions/75921067/spring-boot-graphql-querymapping-not-being-called
+You have to take into account that if you have spring 2.x or you have spring 3.x you
+will need different libraries (see the section before)
+
+So, you will need to include your libraries in the gradle.build
+```
+dependencies {
+...
+    implementation 'org.springframework.boot:spring-boot-starter-graphql:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+..
+```
+
+The motivation to use this library is:
+* Schema first. The schema will be portable
+* Minimal boilerplate: the dtos will be works with the schemas, you don't have to maintain both things.
+* Type discovery or class discovery of mutations and queries.
+* Class validation.
+* Unit testing. You graphql schema is independent of your data model, this makes your classes simple and extremely
+  testeable
+
+To start with kotlin and spring boot, they show you this link: https://github.com/graphql-java-kickstart/graphql-spring-boot
+
+To know what is your kotlin version you will need:
+(https://discuss.kotlinlang.org/t/how-do-i-know-which-kotlin-used/25178)
+```bash
+kotlinc -version
+info: kotlinc-jvm 1.8.0 (JRE 18.0.1.1+2-6)
+```
+
+In addition, in you build.gradle could see the following plugins:
+``` 
+  id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+  id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
+```
+
+According this documentation, you should need to have the kotlin version in you gradle.properties. This file
+you can have in serveral places, the first found in one of these locations wins:
+- in the directory of GRADLE_USER_HOME
+- in the project directory
+- in the graddle installation directory
+  For example, in our case, we don't have this gradle.properties in any of these directories, but have you seen,
+  we have the libraries with the 1.8.x in the build.gradle and we have installed kotlin in
+- C:\tools\kotlin\kotlinc\bin\kotlinc
+- we have a KOTLIN_HOME variable pointing to this directory
+- And our gradle is in local installed, but we use the wrapper in the directory with
+  the gradle-wrapper.properties with the 7.5.1
+
+Regarding our spring version, is the 3.0.6. Because we are establishing it int he build.gradle
+in the plugins:
+```
+plugins {
+id 'org.springframework.boot' version '3.0.6'
+...
+
+```
+In the application.properties you can use:
+```
+graphql.servlet.websocket.enabled= true
+graphql.servlet.mapping=/graphql
+graphql.servlet.cors-enabled= true
+graphql.servlet.cors.allowed-origins= '*'
+graphql.servlet.cors.allowed-methods= GET, HEAD, POST
+graphql.servlet.exception-handlers-enabled=true
+graphql.servlet.context-setting= PER_REQUEST_WITH_INSTRUMENTATION
+graphql.servlet.async.enabled=true
+graphql.playground.enabled= true
+graphql.playground.mapping= /playground
+graphql.playground.settings.schema.disable-comments= false
+spring.graphql.graphiql.enabled=true
+```
+if you include a new variable in your .env file: ENABLE_GRAPHQL_PLAYGROUND = true
+
+you could activate the https://www.gatsbyjs.com/docs/how-to/querying-data/running-queries-with-graphiql/
+what is an interface to develop with
+graphql.graphiql.enabled = true
+/graphiql but your server should be available.
+
+On the other hand, the playground should be available in /playground
+By default:
+/playground
+/graphql
+/subscriptions
+
+De hecho aqui funciona el http://localhost:8080/graphiql
+
+Now we need to create the object types. In resources/locations.graphqls we write it
+and a simple query
+```graphql
+type DummyLocation {
+    id: String!
+    name: String!
+    address: String!
+}
+
+type Query {
+    findAllLocations: [DummyLocation]!
+}
+
+type Mutation {
+    addLocation(
+        id:String!,
+        name:String!,
+        address:String!
+    ): DummyLocation
+}
+```
+By default the schemas must have the extension .grapqls and the folder by default
+is main/resources/graphql, but you could change this folder with this property, for
+example
+spring.graphql.schema.locations=/graphql_other_folder
+
+You will need the model. So we will include:
+
+Location
+``` kotlin
+package com.shoppinglist.application.location
+
+class Location(
+    val id: String,
+    val name: String,
+    val address: String,
+)
+```
+Query resolver
+``` kotlin
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
+
+@Controller
+class LocationQueryResolver {
+    //@SchemaMapping(typeName = "Query", value = "findAllLocations")
+    @QueryMapping
+    fun findAllLocations(): List<DummyLocation> {
+        return listOf(
+            DummyLocation("1","name1", "address1"),
+            DummyLocation("2","name2", "address2"),
+        )
+    }
+}
+```
+Mutation resolver
+``` kotlin
+
+```
+You could use the SqchemaMapping, it is other way to to the same. remember
+to include as controller, in other case it is not going to work.
+http://localhost:8080/graphql
+
+with the following body:
+```
+query {
+    findAllLocations {
+        id
+        name
+        address
+    } 
+}
+``` 
+```
+mutation {
+  addLocation(
+    id:"1",
+  	name:"name4",
+  	address:"address4") {
+    id
+    name
+    address
+  }
+  
+}
+```
+And for testing the API with postman for example you could:
+https://www.apollographql.com/blog/tooling/graphql-ide/how-to-use-graphql-with-postman/
+(you only need to use the graphql option)
+
+The official documentation is in: https://docs.spring.io/spring-graphql/docs/current/reference/html/
+For testing:
+
+testImplementation 'org.springframework.graphql:spring-graphql-test:1.2.0'
+https://dev.to/imphilippesimo/testing-your-graphql-apis-in-a-spring-boot-app-ki7
+https://www.baeldung.com/spring-boot-graphql-spqr
+https://gist.github.com/steklopod/634d5bc55758ac61fdadd029119c8864
+
+You will need this dependency: 
+testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+and you will ned to use
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+in other case it will fail
 # security
 
 # migrations
-
 
 # Postgree
 

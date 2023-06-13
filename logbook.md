@@ -1,9 +1,9 @@
-# 06/05/2023-07/05/2023 
+# 06/05/2023-07/05/2023-11/05/2023-13/06/2023 
 
 ## Done
 
 **Preparation of the project:** working skeleton approach
-
+[ In progress] **Working skeleton:**
     [x] Creation of a spring boot project with kotlin and gradle
     [x] Some examples unit tests with freespecs and junit4/5
     [x] Integration tests examples - With the controller tests and JPA tests
@@ -22,20 +22,21 @@
     [x] Swagger
     [x] log
     [x] SQLite example
+    [x] GraphQL example with apollo
+        [x] Configuration with spring
+        [x] Example and Test with a Query
+        [ ] Test with a mutation
+        [ ] What happens with the playground?
+
 ## Backlog
-**Working skeleton:**
-[ ] GraphQL example with apollo
-
-
+    [ ] README and label the working skeleton
 
 **Outside in shopping list**
-
     [ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc
 
 *Integration with front app**
-    [ ] Terraform
     [ ] Deployment
-
+    [ ] Terraform
 **Database with postgree**
 
 # 30-31/05/2023 -4/06/2023

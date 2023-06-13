@@ -1,0 +1,17 @@
+type DummyLocation {
+id: String!
+name: String!
+address: String!
+}
+
+type Query {
+    findAllLocations: [DummyLocation]
+}
+
+type Mutation {
+    addLocation(
+        id:String!,
+        name:String!,
+        address:String!
+    ): DummyLocation
+}
