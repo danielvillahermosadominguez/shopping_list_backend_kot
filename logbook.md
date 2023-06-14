@@ -1,4 +1,4 @@
-# 06/05/2023-07/05/2023-11/05/2023-13/06/2023 
+# 06/05/2023-07/05/2023-11/05/2023-13/06/2023-14/06/2023 
 
 ## Done
 
@@ -25,13 +25,10 @@
     [x] GraphQL example with apollo
         [x] Configuration with spring
         [x] Example and Test with a Query
-        [x] Test with a mutation
-        [ ] What happens with the playground?
-        [ ] interchange types with front
-
+        [x] Test with a mutation  
+        [ ] README and label the working skeleton
 ## Backlog
-    [ ] README and label the working skeleton
-
+    
 **Outside in shopping list**
     [ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc
 
