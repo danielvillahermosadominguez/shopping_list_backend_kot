@@ -10,6 +10,7 @@ class LocationQueryResolver {
         return listOf(
             DummyLocation("1", "name1", "address1"),
             DummyLocation("2", "name2", "address2"),
+            DummyLocation("3", "name3", "address3"),
         )
     }
 }

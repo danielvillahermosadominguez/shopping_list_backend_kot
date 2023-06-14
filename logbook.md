@@ -25,8 +25,9 @@
     [x] GraphQL example with apollo
         [x] Configuration with spring
         [x] Example and Test with a Query
-        [ ] Test with a mutation
+        [x] Test with a mutation
         [ ] What happens with the playground?
+        [ ] interchange types with front
 
 ## Backlog
     [ ] README and label the working skeleton

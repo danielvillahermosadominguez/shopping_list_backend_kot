@@ -24,12 +24,25 @@ class GraphQLExampleTest {
         }
     """.trimIndent()
 
+    private val addAllLocation: String = """
+         mutation {
+            addLocation(
+                id:"1",
+                name:"name4",
+                address:"address4") {
+                    id
+                    name
+                    address
+                }
+        }
+    """.trimIndent()
+
     @Autowired
     private lateinit var webTestClient: WebTestClient
 
     @Test
     fun `get all locations`() {
-        val query: String? = toJSON(findAllLocations)
+        val query: String? = toJSON("query", findAllLocations)
         webTestClient!!.post()
             .uri(GRAPHQL_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -38,6 +51,16 @@ class GraphQLExampleTest {
             .expectStatus().isOk
             .expectBody()
             .jsonPath("$.data.findAllLocations").isNotEmpty
+            .jsonPath("$.data.findAllLocations[0].id").isEqualTo("1")
+            .jsonPath("$.data.findAllLocations[0].name").isEqualTo("name1")
+            .jsonPath("$.data.findAllLocations[0].address").isEqualTo("address1")
+            .jsonPath("$.data.findAllLocations").isNotEmpty
+            .jsonPath("$.data.findAllLocations[1].id").isEqualTo("2")
+            .jsonPath("$.data.findAllLocations[1].name").isEqualTo("name2")
+            .jsonPath("$.data.findAllLocations[1].address").isEqualTo("address2")
+            .jsonPath("$.data.findAllLocations[2].id").isEqualTo("3")
+            .jsonPath("$.data.findAllLocations[2].name").isEqualTo("name3")
+            .jsonPath("$.data.findAllLocations[2].address").isEqualTo("address3")
         // You are returned the following json
         """
             {
@@ -59,9 +82,37 @@ class GraphQLExampleTest {
         """.trimIndent()
     }
 
-    private fun toJSON(query: String): String? {
+    @Test
+    fun `add location`() {
+        val query: String? = toJSON("query", addAllLocation)
+        var result = webTestClient!!.post()
+            .uri(GRAPHQL_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Mono.just<Any>(query!!), String::class.java)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .json(
+                """
+           {
+              "data": {
+                "addLocation": {
+                  "id": "1",
+                  "name": "name4",
+                  "address": "address4"
+                }
+              }
+           }
+                """.trimIndent(),
+            )
+        // .jsonPath("$.data.addAllLocation").isNotEmpty
+
+        // You are returned the following json
+    }
+
+    private fun toJSON(fieldName: String, queryMutation: String): String? {
         return try {
-            JSONObject().put("query", query).toString()
+            JSONObject().put(fieldName, queryMutation).toString()
         } catch (e: JSONException) {
             throw RuntimeException(e)
         }
