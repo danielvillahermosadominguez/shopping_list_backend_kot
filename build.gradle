@@ -81,7 +81,9 @@ task installGitHook(type: Copy, group: "git-hooks") {
     into { new File(rootProject.rootDir, '.git/hooks')}
     fileMode 0775
 }
-check.dependsOn installGitHook
+
+
+check.dependsOn installGitHook // we should remove it, surely we don't need it
 
 tasks.withType(KotlinCompile) {
     kotlinOptions {
@@ -102,7 +104,7 @@ task ktlint(type: JavaExec, group: "verification") {
     mainClass = "com.pinterest.ktlint.Main"
     args "src/**/*.kt"
 }
-check.dependsOn ktlint
+check.dependsOn ktlint // we should remove it, surely we don't need it
 
 task ktlintFormat(type: JavaExec, group: "verification") {
     jvmArgs "--add-opens", "java.base/java.lang=ALL-UNNAMED"

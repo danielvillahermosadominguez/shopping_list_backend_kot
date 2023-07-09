@@ -1,3 +1,42 @@
+# 09/07/2023
+## Done
+
+**Preparation of the project:** working skeleton approach
+[Done] **Working skeleton:**
+[x] Creation of a spring boot project with kotlin and gradle
+[x] Some examples unit tests with freespecs and junit4/5
+[x] Integration tests examples - With the controller tests and JPA tests
+[x] Mockt example
+[x] Integration with H2 in memory
+[x] linters - ktlint + precommit
+[x] linters - detekt
+[x] Cucumber example
+[x] CI with github actions**
+[x] sonarqube properties and jacoco coverage
+[x] integration with sonarqube and jacoco coverage with CI
+[x] Docker image, github actions and deployment it in the container register
+[x] Deployment in a webapp
+[x] Environment configuration
+[x] Wiremock example
+[x] Swagger
+[x] log
+[x] SQLite example
+[x] GraphQL example with apollo
+[x] Configuration with spring
+[x] Example and Test with a Query
+[x] Test with a mutation  
+[x] README and tag the working skeleton + presentation in the PLP
+## Backlog
+
+**Outside in shopping list**
+[ ] Testing strategies and configurations: SQLite, rollback after transaction, use the database, etc
+
+*Integration with front app**
+[ ] Deployment
+[ ] Terraform
+**Database with postgree**
+
+
 # 06/05/2023-07/05/2023-11/05/2023-13/06/2023-14/06/2023 
 
 ## Done
