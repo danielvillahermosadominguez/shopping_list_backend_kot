@@ -1531,4 +1531,31 @@ spring.security.user.name = admin
 spring.security.user.password = admin
 ```
 
+And you should create this configuration:
+``` kotlin
+@EnableWebSecurity
+@Configuration
+class WebSecurityConfig {
+    @Bean
+    @Throws(Exception::class)
+    fun filterChain(http: HttpSecurity?): SecurityFilterChain? {
+        http?.csrf()?.disable()
+        return http?.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource? {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = Arrays.asList("*")
+        configuration.allowedMethods =
+            Arrays.asList("POST", "PUT", "GET", "OPTIONS", "DELETE", "PATCH") // or simply "*"
+        configuration.allowedHeaders = Arrays.asList("*")
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
+}
+```
+ This would solve problems with your end to end tests, when they access to the service (graphql give problems with this),
+And you should solve the problem when you access to the API from other services.
 

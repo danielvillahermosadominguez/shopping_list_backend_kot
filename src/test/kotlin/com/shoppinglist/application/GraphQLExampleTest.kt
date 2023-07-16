@@ -8,7 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.util.Base64Utils
 import reactor.core.publisher.Mono
+import java.nio.charset.StandardCharsets.UTF_8
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -45,6 +47,11 @@ class GraphQLExampleTest {
         val query: String? = toJSON("query", findAllLocations)
         webTestClient!!.post()
             .uri(GRAPHQL_PATH)
+            .header(
+                "Authorization",
+                "Basic " + Base64Utils
+                    .encodeToString(("admin:admin").toByteArray(UTF_8)),
+            )
             .contentType(MediaType.APPLICATION_JSON)
             .body(Mono.just<Any>(query!!), String::class.java)
             .exchange()
