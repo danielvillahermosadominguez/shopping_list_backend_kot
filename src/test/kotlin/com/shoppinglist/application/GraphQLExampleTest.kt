@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.util.Base64Utils
 import reactor.core.publisher.Mono
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@Import(TestSecurityConfiguration::class)
 class GraphQLExampleTest {
     private val GRAPHQL_PATH = "/graphql"
     private val findAllLocations: String = """
@@ -43,6 +46,7 @@ class GraphQLExampleTest {
     private lateinit var webTestClient: WebTestClient
 
     @Test
+    @WithMockUser
     fun `get all locations`() {
         val query: String? = toJSON("query", findAllLocations)
         webTestClient!!.post()
@@ -90,6 +94,7 @@ class GraphQLExampleTest {
     }
 
     @Test
+    @WithMockUser
     fun `add location`() {
         val query: String? = toJSON("query", addAllLocation)
         var result = webTestClient!!.post()

@@ -33,6 +33,6 @@ class DummyRestController(
         } else {
             logger.info { "Feature toggle example with mail is disabled for example.mail@mail.com" }
         }
-        return ResponseEntity(dummyService.getAll().toList(), HttpStatus.OK)
+        return ResponseEntity(result, HttpStatus.OK)
     }
 }
