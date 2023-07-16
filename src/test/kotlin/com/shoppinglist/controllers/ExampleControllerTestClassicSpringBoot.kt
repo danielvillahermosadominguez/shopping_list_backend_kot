@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import com.shoppinglist.application.ShoppingListBackendKotApplication
 import com.shoppinglist.application.dummy.DummyEntity
 import com.shoppinglist.application.dummy.DummyService
+import com.shoppinglist.common.FeatureToggle
 import io.mockk.every
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,11 +20,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class ExampleControllerTestClassicSpringBoot(@Autowired val mockMvc: MockMvc) {
 
     @MockkBean
+    lateinit var featureToggle: FeatureToggle
+
+    @MockkBean
     lateinit var dummyService: DummyService
 
     @WithMockUser(value = "spring")
     @Test
     fun this_is_an_example_with_mvc() {
+        every { featureToggle.isToggleEnabled(any()) } returns true
+        every { featureToggle.isToggleEnabledForUser(any(), any()) } returns true
+
         every { dummyService.getAll() } returns listOf(DummyEntity())
         mockMvc.perform(get("http://localhost:8080//api/dummy"))
             .andExpect(status().isOk)

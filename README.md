@@ -1314,3 +1314,201 @@ https://olivier-thomas.medium.com/from-backend-to-frontend-typed-application-wit
 https://stackoverflow.com/questions/60692082/recommended-way-for-sharing-types-between-frontend-and-nodejs-graphql
 https://github.com/dotansimha/graphql-code-generator
 In the case of vue, you will need to use the graphql generator, it is a library for this purpose.
+## Feature toggle with configCat
+The first thing you need to do is to create an account in app.configcat.com.
+I'm using my account for other clients, so I have create a new account with my account but 
+with +configcat. For example: mymail+configcat@gmail.com
+
+In this way you won't have problems to have with the same email several accounts.
+
+The documentation for Kotlin is here: https://configcat.com/docs/sdk-reference/kotlin/
+
+### Using the configuration for java-client
+
+In kotlin you could use this configuration.
+
+You will need to include in your gradle.build the folowing dependency:
+```kotlin
+ // ConfigCat
+    implementation 'com.configcat:configcat-java-client:7.+'
+```
+
+You will need to create a configuration, for example, ConfigCatConfig.kt
+```kotlin
+@Configuration
+@Profile("!test")
+@Suppress("MayBeConst")
+class ConfigCatConfig(
+    @Value("\${configcat.sdk-key}") private val sdkKey: String,
+) {
+    companion object {
+        private val POLLING_TIME_IN_SECONDS = 15
+    }
+
+    @Bean
+    fun configCatClient(): ConfigCatClient = ConfigCatClient.newBuilder()
+        .mode(PollingModes.autoPoll(POLLING_TIME_IN_SECONDS))
+        .logLevel(INFO)
+        .build(sdkKey)
+}
+```
+
+And you would need a client:
+
+```kotlin
+@Component
+class FeatureToggle(
+    @Autowired private val configCatClient: ConfigCatClient
+) {
+    fun isToggleEnabled(toggleName: FeatureToggleNames): Boolean {
+        return configCatClient.getValue(Boolean::class.java, toggleName.toggleKey, false)
+    }
+
+    fun isToggleEnabledForUser(toggleName: FeatureToggleNames, email: String): Boolean {
+        val userObject = User.newBuilder().email(email).build(email)
+        return getToggleValueForUser(toggleName.toggleKey, userObject)
+    }
+
+    fun allTogglesForUser(email: String): Map<String, Boolean> {
+        val userObject = User.newBuilder().email(email).build(email)
+        val allToggles = configCatClient.allKeys
+        return allToggles.associateWith { toggleName -> getToggleValueForUser(toggleName, userObject) }
+    }
+
+    fun getInteger(toggleName: FeatureToggleNames, defaultValue: Int): Int {
+        return try {
+            configCatClient.getValue(Int::class.java, toggleName.toggleKey, defaultValue)
+        } catch (_: Exception) {
+            defaultValue
+        }
+    }
+
+    fun getValueByIdentifier(toggleName: FeatureToggleNames, identifier: String, defaultValue: String): String {
+        val userObject = User.newBuilder().build(identifier)
+        return configCatClient.getValue(String::class.java, toggleName.toggleKey, userObject, defaultValue)
+    }
+
+    private fun getToggleValueForUser(toggleName: String, userObject: User) =
+        configCatClient.getValue(Boolean::class.java, toggleName, userObject, false)
+}
+```
+
+And in your code, you should:
+```kotlin
+...
+if (featureToggle.isToggleEnabledForUser("identifierInConfigCat", "your email")) {
+    //your code
+}
+...
+if (featureToggle.isToggleEnabled("identifierInConfigCat")) {
+  //your code
+}
+```
+### Using the configuration for kotlin
+According to the documentation, these are the steps:
+1. Install the ConfigCat SDK, In the build.gradle and you will need also coroutines
+```kotlin
+implementation("com.configcat:configcat-kotlin-client:$configcat_version")
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+```
+
+2. Create a configuration and a environment variable for the SDK Key
+```kotlin
+@Configuration
+@ConfigurationPropertiesScan
+class ConfigCatConfiguration {
+  @Value("\${configcat.sdkKey}")
+  private lateinit var configKatSdkKey: String
+
+  @Bean
+  fun configCatClient() = ConfigCatClient(configKatSdkKey) {
+    pollingMode = autoPoll {
+      pollingInterval = 60.seconds
+    }
+  }
+}
+```
+Take into account we have used a polling interval of 60 seconds. That means the feature toggle value
+will be update every 60 seconds. 
+
+3. Create a client with your SKD key (You should create an environment variable for this)
+You can find the sdk key in your product in config cat. This is the simplest implementation, in the
+code you have available a full implementation.
+```kotlin
+
+@Component
+class FeatureToggle(
+  @Autowired private val configCatClient: ConfigCatClient
+) {
+  fun isToggleEnabled(toggleName: FeatureToggleNames): Boolean {
+    return runBlocking {
+      configCatClient.getValue(toggleName.toggleKey, false)
+    }
+  }
+
+  fun isToggleEnabledForUser(toggleName: FeatureToggleNames, email: String): Boolean {
+    return runBlocking {
+      configCatClient.getValue(
+        toggleName.toggleKey,
+        defaultValue = false,
+        user = ConfigCatUser(email),
+      )
+    }
+  }
+
+  companion object {
+    fun close() {
+      ConfigCatClient.closeAll()
+    }
+  }
+}
+```
+
+You could use this feature toggle where you want. Here an example:
+``` kotlin
+@RestController
+@RequestMapping("api/dummy")
+class DummyRestController(@Autowired var dummyService: DummyService,
+                          @Autowired var featureToggle: FeatureToggle) {
+    @GetMapping
+    fun dummyGet(): ResponseEntity<List<DummyEntity>> {
+        if(featureToggle.isToggleEnabled(FeatureToggleNames.IS_AN_EXAMPLE_ENABLED) ) {
+            logger.info { "Feature toggle example is enabled" }
+        } else {
+            logger.info { "Feature toggle example is disabled" }
+        }
+
+        if(featureToggle.isToggleEnabledForUser(FeatureToggleNames.IS_AN_EXAMPLE_WITH_USER_ENABLED,"example.mail@mail.com")) {
+            logger.info { "Feature toggle example with mail is enabled for example.mail@mail.com" }
+        } else {
+            logger.info { "Feature toggle example with mail is disabled for example.mail@mail.com" }
+        }
+        return ResponseEntity(dummyService.getAll().toList(), HttpStatus.OK)
+    }
+}
+```
+To use in the test the feature toggles, you only will have to double the feature toggle with Mockk.
+
+``` kotlin
+@WebMvcTest
+@ContextConfiguration(classes = [(ShoppingListBackendKotApplication::class)])
+class ExampleControllerTestClassicSpringBoot(@Autowired val mockMvc: MockMvc) {
+
+    @MockkBean
+    lateinit var featureToggle: FeatureToggle
+
+    @MockkBean
+    lateinit var dummyService: DummyService
+
+    @WithMockUser(value = "spring")
+    @Test
+    fun this_is_an_example_with_mvc() {
+        every {featureToggle.isToggleEnabled(any())} returns true
+        every {featureToggle.isToggleEnabledForUser(any(), any())} returns true
+
+        every { dummyService.getAll() } returns listOf(DummyEntity())
+        mockMvc.perform(get("http://localhost:8080//api/dummy"))
+            .andExpect(status().isOk)
+    }
+}
+```

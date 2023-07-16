@@ -16,6 +16,7 @@ group = 'com.shoppinglist'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '18'
 
+
 configurations {
     ktlint
 }
@@ -49,6 +50,9 @@ dependencies {
     implementation 'io.github.microutils:kotlin-logging-jvm:3.0.5'
     implementation 'org.xerial:sqlite-jdbc:3.40.1.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects'
+    implementation("com.configcat:configcat-kotlin-client:1.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+
 
     configurations.testImplementation.exclude(group: 'me.paulschwarz', module: 'spring-dotenv')
 

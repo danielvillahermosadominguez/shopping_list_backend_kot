@@ -1,4 +1,4 @@
-# 09/07/2023
+# 09/07/2023 - 11/07/2023 - 16.07
 ## Done
 
 **Preparation of the project:** working skeleton approach
@@ -26,6 +26,7 @@
 [x] Example and Test with a Query
 [x] Test with a mutation  
 [x] README and tag the working skeleton + presentation in the PLP
+[x] Feature toggle with config cat
 ## Backlog
 
 **Outside in shopping list**

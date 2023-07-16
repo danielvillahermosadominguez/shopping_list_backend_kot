@@ -1,8 +1,11 @@
 package com.shoppinglist.integration
 
+import com.ninjasquad.springmockk.MockkBean
 import com.shoppinglist.application.ShoppingListBackendKotApplication
 import com.shoppinglist.application.dummy.DummyEntity
 import com.shoppinglist.application.dummy.DummyRepository
+import com.shoppinglist.common.FeatureToggle
+import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,8 +26,13 @@ class ExampleJPAIntegrationTestClassicSpring {
     @Autowired
     lateinit var repository: DummyRepository
 
+    @MockkBean
+    lateinit var featureToggle: FeatureToggle
+
     @Test
     fun dummyExampleOfIntegrationTestWithDB() {
+        every { featureToggle.isToggleEnabled(any()) } returns true
+        every { featureToggle.isToggleEnabledForUser(any(), any()) } returns true
         val dummyEntity = DummyEntity()
         entityManager.persist(dummyEntity)
         entityManager.flush()
