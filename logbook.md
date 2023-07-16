@@ -27,6 +27,7 @@
 [x] Test with a mutation  
 [x] README and tag the working skeleton + presentation in the PLP
 [x] Feature toggle with config cat
+[x] Security/Login and Tests
 ## Backlog
 
 **Outside in shopping list**

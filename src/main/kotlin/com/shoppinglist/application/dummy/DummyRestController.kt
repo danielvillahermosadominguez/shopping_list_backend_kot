@@ -19,13 +19,16 @@ class DummyRestController(
 ) {
     @GetMapping
     fun dummyGet(): ResponseEntity<List<DummyEntity>> {
+        var result = dummyService.getAll().toList()
         if (featureToggle.isToggleEnabled(FeatureToggleNames.IS_AN_EXAMPLE_ENABLED)) {
+            result += DummyEntity(id = 1234)
             logger.info { "Feature toggle example is enabled" }
         } else {
             logger.info { "Feature toggle example is disabled" }
         }
 
         if (featureToggle.isToggleEnabledForUser(FeatureToggleNames.IS_AN_EXAMPLE_WITH_USER_ENABLED, "example.mail@mail.com")) {
+            result += DummyEntity(id = 5678)
             logger.info { "Feature toggle example with mail is enabled for example.mail@mail.com" }
         } else {
             logger.info { "Feature toggle example with mail is disabled for example.mail@mail.com" }
