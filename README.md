@@ -1352,7 +1352,7 @@ class ConfigCatConfig(
         .build(sdkKey)
 }
 ```
-
+º
 And you would need a client:
 
 ```kotlin
@@ -1512,3 +1512,23 @@ class ExampleControllerTestClassicSpringBoot(@Autowired val mockMvc: MockMvc) {
     }
 }
 ```
+
+# Deployment in azure - the Web app
+
+## Autentication for your app service
+(To be developed)
+https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service
+Our example service has autentication enabled (Basic autentication). When you adds the library for
+security, by default you will have this basic autentication
+```
+implementation 'org.springframework.boot:spring-boot-starter-security'
+```
+to avoid having this security you will need to comment this library in your build.gradle
+
+Also, you can setup the name and the password by default
+```
+spring.security.user.name = admin
+spring.security.user.password = admin
+```
+
+
